@@ -1,0 +1,73 @@
+Sub calculateStocks()
+    
+    Dim stockID As String 'tracks the tickers
+    Dim volume As Double 'stores the total volume of a stock
+    Dim resultIndex As Integer 'tracks the row the results will be logged
+    Dim openValue As Double 'stores the open value
+    Dim closeValue As Double 'stores the close value
+    Dim yrChange As Double 'stores the calculation of close - open
+    Dim percentage As Double 'stores percentage differance of close and open
+    Cells(1, 9).Value = "ticker"
+    Cells(1, 10).Value = "Yearly Change"
+    Cells(1, 11).Value = "percentage"
+    Cells(1, 12).Value = "volume"
+    
+    'set the volume variable to zero to give us a starting point for adding the volumes together for a year
+    volume = 0
+'We set the index to 2 because 1 is used for the headers
+    resultIndex = 2
+'We are starting at index 2 and use a random amount to loop
+    For I = 2 To 10000
+
+'If the openValue is zero, then grab the first value from the row
+      If openValue = 0 Then
+
+          openValue = Cells(I, 3).Value
+      End If
+'Checking to see if we are about to go the the next stock ID by checking the stock in the cell above and below to see if they are different
+      If Cells(I - 1, 1) = Cells(I, 1) And Cells(I + 1, 1) <> Cells(I, 1) Then
+          closeValue = Cells(I, 6).Value
+          'Percent Change is [(New - Old) / Old] * 100
+          yrChange = closeValue - openValue
+          If yrChange = 0 And openValue = 0 Then
+            percentage = 0
+          Else
+            percentage = (yrChange / openValue) * 100
+        End If
+
+         'Update the stockID
+          stockID = Cells(I, 1).Value
+
+        'Finish adding the total volume
+          volume = volume + Cells(I, 7).Value
+
+
+          'log out the results using the range function and result index
+          Range("j" & resultIndex).Value = yrChange
+          Range("I" & resultIndex).Value = stockID
+          Range("K" & resultIndex).Value = percentage
+          Range("L" & resultIndex).Value = volume
+        
+        'Ensures we start at the next line after logging out
+          resultIndex = resultIndex + 1
+        'We want to start counting the volume over for the next stock ID
+          volume = 0
+          
+          'Reset the openValue, so it finds the first value in the new set
+          openValue = 0
+
+      Else
+        'Adding to total Volume together
+          volume = volume + Cells(I, 7).Value
+      End If
+      
+      'Once we reach an empty cell,  we are done with the sheet and should exit the loop
+      If IsEmpty(stockID) Then
+        Exit For
+    End If
+
+    Next I
+
+End Sub
+
+
